@@ -5,6 +5,7 @@
  */
 package servicio;
 
+import datos.PersonaDao;
 import domain.Persona;
 import java.util.List;
 import javax.ejb.Stateless;
@@ -30,20 +31,21 @@ import javax.ws.rs.core.Response;
 public class PersonaServiceRS {
     
     @Inject
-    private PersonaService personaService;
+    private PersonaDao personaService;
     
     
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+   
     public List<Persona> listarPersonas(){
         
-        return personaService.listarPersonas();
+        return personaService.findAllPersonas();
     }
     @GET
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     @Path("{id}")
-    public Persona enocontrarPersonaPorId(@PathParam("id")int id){
-    return personaService.econtrarPersonaPorId(new Persona(id));
+    public Persona econtrarPersonaPorId(@PathParam("id")int id){
+    return personaService.findPersonaById(new Persona(id));
     }
     
     
@@ -52,7 +54,7 @@ public class PersonaServiceRS {
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response agregarPersona(Persona persona){
        try{
-            personaService.registrarPersona(persona);
+            personaService.insertPersona(persona);
     return Response.ok().entity(persona).build();
        }catch(Exception ex){
            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
@@ -65,9 +67,9 @@ public class PersonaServiceRS {
     @Path("{id}")
     public Response modificarPersona(@PathParam("id") int id, Persona personaModificada){
         try{
-        Persona persona = personaService.econtrarPersonaPorId(new Persona(id));
+        Persona persona = personaService.findPersonaById(new Persona(id));
         if(persona != null){
-            personaService.modificarPersona(personaModificada);
+            personaService.updatePersona(personaModificada);
             return Response.ok().entity(personaModificada).build();
         }else{
             return Response.status(Response.Status.NOT_FOUND).build();
@@ -82,11 +84,12 @@ public class PersonaServiceRS {
     @Path("{id}")
     public Response eliminarPersonaPorId(@PathParam("id") int id){
         try {
-            personaService.eliminarPersona(new Persona(id));
+            personaService.deletePersona(new Persona(id));
             return Response.ok().build();
         } catch (Exception e) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
     }
-    
+
+ 
 }
